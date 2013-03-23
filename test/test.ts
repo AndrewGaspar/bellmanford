@@ -11,13 +11,25 @@ interface assertFunc {
 var assert = <assertFunc>(<any>as);
 
 declare var describe: (descriptor: string, suite: () => void ) => void;
-declare var it: (descriptor: string, test: (done?: (err?) => void ) => void ) => void;
+//declare var it: (descriptor: string, test: () => void ) => void;
+declare var it: (descriptor: string, test: (done: (err?: any) => void ) => void ) => void;
+
+class Node implements bf.INode {
+    constructor(public id: number) { }
+}
+
+function compareShortestPaths(paths: bf.DistanceResultList, nodeArray: bf.INode[], distanceVec: number[]) {
+    for (var i = 0; i < nodeArray.length; i++) {
+        if (paths.getDistanceFrom(nodeArray[i]).distance != distanceVec[i]) return false;
+    }
+    return true;
+}
 
 describe("BellmanFordSearch", function() {
     describe("#getShortestPaths()", function () {
         var nodeList = new bf.NodeList();
         for (var i = 0; i < 6; i++) {
-            nodeList.addNode(new bf.Node());
+            nodeList.addNode(new Node(i+1));
         }
 
         var nodeArray = nodeList.toArray();
@@ -65,11 +77,15 @@ describe("BellmanFordSearch", function() {
         it("should have the following shortest paths to node 2", function () {
             var shortestPaths = graph.getShortestPathsSync(nodeArray[1]);
 
-            as.equal(shortestPaths.getDistanceFrom(nodeArray[0]).distance, 3);
-            as.equal(shortestPaths.getDistanceFrom(nodeArray[2]).distance, 3);
-            as.equal(shortestPaths.getDistanceFrom(nodeArray[3]).distance, 1);
-            as.equal(shortestPaths.getDistanceFrom(nodeArray[4]).distance, 4);
-            as.equal(shortestPaths.getDistanceFrom(nodeArray[5]).distance, 4);
+            assert(compareShortestPaths(shortestPaths, nodeArray, [3, 0, 3, 1, 4, 4]), "don't match");
+        });
+
+        it("should still work async", function (done: (err?) => void ) {
+            var shortestPaths = graph.getShortestPathsAsync(nodeArray[5])
+                .then(function (paths) {
+                    if (compareShortestPaths(paths, nodeArray, [3, 4, 1, 3, 2, 0])) done();
+                    else done("don't match");
+                }, done);
         });
     });
 });

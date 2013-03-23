@@ -1,4 +1,8 @@
-﻿export interface IList {
+﻿/// <reference path="q.module.d.ts" />
+
+import q = module('q');
+
+export interface IList {
     forEach(op: () => void ): void;
     toArray(): any[];
 }
@@ -98,6 +102,10 @@ export class EdgeMap {
 
 export class DistanceResult {
 
+    public toString() {
+        return "{via:" + ((this.via) ? this.via.id.toString() : '-') + ",distance:" + this.distance + "}";
+    }
+
     constructor(public distance: number, public via: INode) {
 
     }
@@ -106,9 +114,36 @@ export class DistanceResult {
 export class DistanceResultList {
     private _distances = <ResultMap>{};
 
+    public forEach(op: (distance: number, id: number, iteration: number) => void ) {
+        var i = 0;
+        for (var key in this._distances) {
+            op(this._distances[key], Number(key), i++);
+        }
+    }
+
     public getDistanceFrom(source: INode): DistanceResult {
         if (!this._distances[source.id]) return this._distances[source.id] = new DistanceResult(Number.POSITIVE_INFINITY, null);
         return this._distances[source.id];
+    }
+
+    public copy() {
+        var c = new DistanceResultList(this.destination);
+        var distances = <ResultMap>{};
+        for (var key in this._distances) {
+            distances[key] = this._distances[key];
+        }
+        c._distances = distances;
+        return c;
+    }
+
+    public toString() {
+        var out = "{";
+        this.forEach(function (distance, id, i) {
+            if (i > 0) out += ',';
+            out += id.toString() + ":" + distance.toString();
+        });
+        out += "}";
+        return out;
     }
 
     constructor(public destination: INode) {
@@ -125,28 +160,67 @@ export class Graph {
     constructor(public nodes: NodeList, public edges: EdgeMap) {
     }
 
+    private updatePaths(paths: DistanceResultList) {
+        this.edges.forEach(function (u, v, w) {
+            var uPath = paths.getDistanceFrom(u);
+            var vPath = paths.getDistanceFrom(v);
+
+            if (uPath.distance + w < vPath.distance) {
+                vPath.distance = uPath.distance + w;
+                vPath.via = u;
+            }
+        });
+
+        return paths;
+    }
+
+    private negativeCycleExists(paths: DistanceResultList) {
+        var failure = false;
+
+        this.edges.forEach((u, v, w) =>
+        {
+            if (paths.getDistanceFrom(u).distance + w < paths.getDistanceFrom(v).distance)
+                failure = true;
+        });
+
+        return failure;
+    }
+
+    public getShortestPathsAsync(destination: INode): Qpromise {
+        var _this = this,
+            d = q.defer();
+
+        var shortestPaths = new DistanceResultList(destination);
+
+        var request = q(shortestPaths);
+        for (var i = 0; i < this.nodes.length - 1; i++) {
+            request = request.then(function (paths: DistanceResultList) {
+                d.notify(paths.copy());
+                return _this.updatePaths(paths);
+            });
+        }
+
+        request.then(function (paths) {
+            d.notify(paths.copy());
+            if (_this.negativeCycleExists(paths)) {
+                d.reject(new Error("negative cycle"));
+            } else {
+                d.resolve(paths.copy());
+            }
+        });
+
+        return d.promise;
+    }
+
     public getShortestPathsSync(destination: INode): DistanceResultList {
         var shortestPaths = new DistanceResultList(destination);
 
         for (var i = 0; i < this.nodes.length - 1; i++) {
-            this.edges.forEach(function (u, v, w) {
-                var uPath = shortestPaths.getDistanceFrom(u);
-                var vPath = shortestPaths.getDistanceFrom(v);
-
-                if (uPath.distance + w < vPath.distance) {
-                    vPath.distance = uPath.distance + w;
-                    vPath.via = u;
-                }
-            });
+            this.updatePaths(shortestPaths);
         }
 
-        this.edges.forEach((u, v, w) =>
-        {
-            if (shortestPaths.getDistanceFrom(u).distance + w
-                < shortestPaths.getDistanceFrom(v).distance)
-                throw "negative-weight cycle";
-        });
+        if (this.negativeCycleExists(shortestPaths)) throw new Error("negative cycle");
 
-        return shortestPaths;
+        return shortestPaths.copy();
     }
 }
