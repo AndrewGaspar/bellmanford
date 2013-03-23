@@ -17,6 +17,8 @@ distinct ids, you should be fine.
 TypeScript:
 -----------
 
+	import bf = module("bellmanford");
+
 	var nodeList = new bf.NodeList();
     for (var i = 0; i < 6; i++) {
         nodeList.addNode(new bf.Node());
@@ -40,6 +42,6 @@ TypeScript:
         
     edgeMap.setEdge(nodeArray[4], nodeArray[5], 2);
 
-    var graph = new bf.BellmanFordSearch(nodeList, edgeMap);
+    var graph = new bf.Graph(nodeList, edgeMap);
 
 	var shortestPaths = graph.getShortestPathsSync(nodeArray[0]);

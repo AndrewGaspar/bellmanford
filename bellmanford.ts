@@ -116,7 +116,7 @@ export class DistanceResultList {
     }
 }
 
-export class BellmanFordSearch {
+export class Graph {
 
     public addNode(node: INode): void {
         this.nodes.addNode(node);

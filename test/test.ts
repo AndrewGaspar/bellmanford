@@ -38,7 +38,7 @@ describe("BellmanFordSearch", function() {
         
         edgeMap.setEdge(nodeArray[4], nodeArray[5], 2);
 
-        var graph = new bf.BellmanFordSearch(nodeList, edgeMap);
+        var graph = new bf.Graph(nodeList, edgeMap);
 
         it("should return true", function () {
             assert(true,"Value was not true");
