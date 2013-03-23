@@ -1,6 +1,6 @@
 {
   "name": "bellmanford",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "bellmanford\r ===========",
   "main": "bellmanford.js",
   "scripts": {
