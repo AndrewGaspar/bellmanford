@@ -1,6 +1,6 @@
 {
   "name": "bellmanford",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "bellmanford\r ===========",
   "main": "bellmanford.js",
   "scripts": {
@@ -30,6 +30,6 @@
   "gitHead": "7aee249f17dc712adefd93d73b4abd398cdbb0b2",
   "dependencies": {},
   "devDependencies": {
-	"mocha": "1.8.2"
+    "mocha": "1.8.2"
   }
 }
