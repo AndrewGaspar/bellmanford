@@ -17,31 +17,34 @@ distinct ids, you should be fine.
 TypeScript:
 -----------
 
-	import bf = module("bellmanford");
+```TypeScript
+import bf = module("bellmanford");
 
-	var nodeList = new bf.NodeList();
-    for (var i = 0; i < 6; i++) {
-        nodeList.addNode(new bf.Node());
-    }
+var nodeList = new bf.NodeList();
+    
+for (var i = 0; i < 6; i++) {
+nodeList.addNode(new bf.Node());
+}
 
-    var nodeArray = nodeList.toArray();
+var nodeArray = nodeList.toArray();
 
-    var edgeMap = new bf.EdgeMap(nodeList);
+var edgeMap = new bf.EdgeMap(nodeList);
 
-    edgeMap.setEdge(nodeArray[0], nodeArray[1], 3);
-    edgeMap.setEdge(nodeArray[0], nodeArray[2], 2);
-    edgeMap.setEdge(nodeArray[0], nodeArray[3], 5);
-        
-    edgeMap.setEdge(nodeArray[1], nodeArray[3], 1);
-    edgeMap.setEdge(nodeArray[1], nodeArray[4], 4);
+edgeMap.setEdge(nodeArray[0], nodeArray[1], 3);
+edgeMap.setEdge(nodeArray[0], nodeArray[2], 2);
+edgeMap.setEdge(nodeArray[0], nodeArray[3], 5);
 
-    edgeMap.setEdge(nodeArray[2], nodeArray[3], 2);
-    edgeMap.setEdge(nodeArray[2], nodeArray[5], 1);
+edgeMap.setEdge(nodeArray[1], nodeArray[3], 1);
+edgeMap.setEdge(nodeArray[1], nodeArray[4], 4);
 
-    edgeMap.setEdge(nodeArray[3], nodeArray[4], 3);
-        
-    edgeMap.setEdge(nodeArray[4], nodeArray[5], 2);
+edgeMap.setEdge(nodeArray[2], nodeArray[3], 2);
+edgeMap.setEdge(nodeArray[2], nodeArray[5], 1);
 
-    var graph = new bf.Graph(nodeList, edgeMap);
+edgeMap.setEdge(nodeArray[3], nodeArray[4], 3);
 
-	var shortestPaths = graph.getShortestPathsSync(nodeArray[0]);
+edgeMap.setEdge(nodeArray[4], nodeArray[5], 2);
+
+var graph = new bf.Graph(nodeList, edgeMap);
+
+var shortestPaths = graph.getShortestPathsSync(nodeArray[0]);
+```
