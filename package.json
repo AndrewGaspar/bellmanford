@@ -4,7 +4,7 @@
   "description": "bellmanford\r ===========",
   "main": "bellmanford.js",
   "scripts": {
-    "prepublish": "cd test && tsc --target ES5 test.ts && cd .. && tsc --target ES5 bellmanford.ts",
+    "prepublish": "cd test && tsc --target ES5 test.ts && cd .. && tsc --target ES5 --declaration bellmanford.ts",
     "test": "mocha"
   },
   "repository": {
